@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>IP Checker متقدم</title>
+  <title>IP & DNS Checker</title>
   <style>
     body { font-family: Tahoma; direction: rtl; background: #f9f9f9; padding: 20px; }
     h1 { color: #333; }
@@ -10,10 +10,11 @@
   </style>
 </head>
 <body>
-  <h1>مرحباً بك في موقع فحص الـ IP</h1>
+  <h1>مرحباً بك في موقع فحص الـ IP و الـ DNS</h1>
   <button onclick="getDetails()">اعرض التفاصيل</button>
   
   <div id="info" class="box"></div>
+  <div id="dns" class="box"></div>
 
   <script>
     async function getDetails() {
@@ -36,6 +37,23 @@
         <p><b>اللغة:</b> ${lang}</p>
         <p><b>المنطقة الزمنية:</b> ${timezone}</p>
       `;
+
+      // جلب معلومات DNS من خدمة خارجية
+      let dnsResponse = await fetch("https://dns.google/resolve?name=example.com&type=A");
+      let dnsData = await dnsResponse.json();
+
+      let servers = dnsData.Authority ? dnsData.Authority : dnsData.Answer;
+      let dnsInfo = "<h3>خوادم DNS المستخدمة:</h3>";
+
+      if (servers) {
+        servers.forEach(s => {
+          dnsInfo += `<p>${s.name} → ${s.data}</p>`;
+        });
+      } else {
+        dnsInfo += "<p>لم يتم العثور على تفاصيل DNS</p>";
+      }
+
+      document.getElementById("dns").innerHTML = dnsInfo;
     }
   </script>
 </body>
