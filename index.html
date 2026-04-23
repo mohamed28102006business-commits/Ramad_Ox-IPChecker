@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IP Checker</title>
+</head>
+<body>
+  <h1>مرحبًا بك في موقع فحص الـ IP</h1>
+  <p>اضغط الزر لمعرفة عنوان الـ IP الخاص بك:</p>
+  <button onclick="getIP()">اعرض الـ IP</button>
+  <p id="result"></p>
+
+  <script>
+    async function getIP() {
+      let response = await fetch("https://api.ipify.org?format=json");
+      let data = await response.json();
+      document.getElementById("result").innerText = "عنوان الـ IP الخاص بك هو: " + data.ip;
+    }
+  </script>
+</body>
+</html>
