@@ -1,19 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
-  <title>IP Checker</title>
+  <meta charset="UTF-8">
+  <title>IP Checker متقدم</title>
+  <style>
+    body { font-family: Tahoma; direction: rtl; background: #f9f9f9; padding: 20px; }
+    h1 { color: #333; }
+    .box { background: #fff; padding: 15px; margin: 10px 0; border-radius: 8px; box-shadow: 0 0 5px #ccc; }
+  </style>
 </head>
 <body>
-  <h1>مرحبًا بك في موقع فحص الـ IP</h1>
-  <p>اضغط الزر لمعرفة عنوان الـ IP الخاص بك:</p>
-  <button onclick="getIP()">اعرض الـ IP</button>
-  <p id="result"></p>
+  <h1>مرحباً بك في موقع فحص الـ IP</h1>
+  <button onclick="getDetails()">اعرض التفاصيل</button>
+  
+  <div id="info" class="box"></div>
 
   <script>
-    async function getIP() {
-      let response = await fetch("https://api.ipify.org?format=json");
+    async function getDetails() {
+      // جلب الـ IP والموقع من ipapi
+      let response = await fetch("https://ipapi.co/json/");
       let data = await response.json();
-      document.getElementById("result").innerText = "عنوان الـ IP الخاص بك هو: " + data.ip;
+
+      // بيانات المتصفح
+      let browser = navigator.userAgent;
+      let lang = navigator.language;
+      let platform = navigator.platform;
+      let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      document.getElementById("info").innerHTML = `
+        <p><b>عنوان الـ IP:</b> ${data.ip}</p>
+        <p><b>الموقع:</b> ${data.city}, ${data.country_name}</p>
+        <p><b>مزود الخدمة (ISP):</b> ${data.org}</p>
+        <p><b>المتصفح:</b> ${browser}</p>
+        <p><b>النظام:</b> ${platform}</p>
+        <p><b>اللغة:</b> ${lang}</p>
+        <p><b>المنطقة الزمنية:</b> ${timezone}</p>
+      `;
     }
   </script>
 </body>
