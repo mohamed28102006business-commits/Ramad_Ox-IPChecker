@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>IP & DNS Checker</title>
+  <title>IP & DNS & WebRTC Checker</title>
   <style>
     body { font-family: Tahoma; direction: rtl; background: #f9f9f9; padding: 20px; }
     h1 { color: #333; }
@@ -10,11 +10,12 @@
   </style>
 </head>
 <body>
-  <h1>مرحباً بك في موقع فحص الـ IP و الـ DNS</h1>
+  <h1>مرحباً بك في موقع فحص الـ IP و الـ DNS و WebRTC</h1>
   <button onclick="getDetails()">اعرض التفاصيل</button>
   
   <div id="info" class="box"></div>
   <div id="dns" class="box"></div>
+  <div id="webrtc" class="box"></div>
 
   <script>
     async function getDetails() {
@@ -38,13 +39,11 @@
         <p><b>المنطقة الزمنية:</b> ${timezone}</p>
       `;
 
-      // جلب معلومات DNS من خدمة خارجية
+      // جلب معلومات DNS (اختبار مبسط)
       let dnsResponse = await fetch("https://dns.google/resolve?name=example.com&type=A");
       let dnsData = await dnsResponse.json();
-
       let servers = dnsData.Authority ? dnsData.Authority : dnsData.Answer;
       let dnsInfo = "<h3>خوادم DNS المستخدمة:</h3>";
-
       if (servers) {
         servers.forEach(s => {
           dnsInfo += `<p>${s.name} → ${s.data}</p>`;
@@ -52,8 +51,25 @@
       } else {
         dnsInfo += "<p>لم يتم العثور على تفاصيل DNS</p>";
       }
-
       document.getElementById("dns").innerHTML = dnsInfo;
+
+      // WebRTC Leak Test
+      let rtc = new RTCPeerConnection({iceServers:[]});
+      rtc.createDataChannel("");
+      rtc.createOffer().then(offer => rtc.setLocalDescription(offer));
+      rtc.onicecandidate = function(event) {
+        if (event && event.candidate && event.candidate.candidate) {
+          let candidate = event.candidate.candidate;
+          let ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9:]+)\b/;
+          let ipMatch = candidate.match(ipRegex);
+          if (ipMatch) {
+            document.getElementById("webrtc").innerHTML = `
+              <h3>WebRTC Leak Test:</h3>
+              <p><b>Local/Public IP:</b> ${ipMatch[1]}</p>
+            `;
+          }
+        }
+      };
     }
   </script>
 </body>
